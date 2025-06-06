@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新余市规划设计院合同管理平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .main-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .nav-item {
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: #333;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .content-area {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .module {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .module.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-card {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            padding: 25px;
+            border-radius: 15px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .dashboard-card:nth-child(2) {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+
+        .dashboard-card:nth-child(3) {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        }
+
+        .dashboard-card:nth-child(4) {
+            background: linear-gradient(135deg, #c3cfe2 0%, #c3cfe2 100%);
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .card-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .card-desc {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #56ab2f, #a8e6cf);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .table th,
+        .table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .table th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-weight: 600;
+        }
+
+        .table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-executed {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .filter-select {
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            background: #f8f9fa;
+            cursor: pointer;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+        }
+
+        .contract-item {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .contract-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .contract-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .contract-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .contract-meta {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .contract-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e1e5e9;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .workflow-step {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-left: 4px solid #667eea;
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 15px;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .step-desc {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e1e5e9;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .close {
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+
+        .notification-badge {
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 10px;
+            position: absolute;
+            top: -5px;
+            right: -5px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .feature-desc {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-bar {
+                flex-direction: column;
+            }
+            
+            .search-input {
+                min-width: 100%;
+            }
+            
+            .contract-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>新余市规划设计院合同管理平台</h1>
+            <p>智能化合同全生命周期管理系统</p>
+        </div>
+
+        <!-- 主导航 -->
+        <div class="main-nav">
+            <button class="nav-item active" onclick="showModule('dashboard')">
+                📊 工作台
+            </button>
+            <button class="nav-item" onclick="showModule('contracts')">
+                📄 合同管理 <span class="notification-badge">3</span>
+            </button>
+            <button class="nav-item" onclick="showModule('approval')">
+                ✅ 审批流程
+            </button>
+            <button class="nav-item" onclick="showModule('templates')">
+                📝 合同模板
+            </button>
+            <button class="nav-item" onclick="showModule('tracking')">
+                📈 履行跟踪
+            </button>
+            <button class="nav-item" onclick="showModule('reports')">
+                📊 数据分析
+            </button>
+            <button class="nav-item" onclick="showModule('settings')">
+                ⚙️ 系统设置
+            </button>
+        </div>
+
+        <!-- 内容区域 -->
+        <div class="content-area">
+            <!-- 工作台模块 -->
+            <div id="dashboard" class="module active">
+                <h2 style="margin-bottom: 20px; color: #333;">📊 工作台概览</h2>
+                
+                <!-- 数据卡片 -->
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-title">待审批合同</div>
+                        <div class="card-number">8</div>
+                        <div class="card-desc">需要您审批的合同</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-title">执行中合同</div>
+                        <div class="card-number">156</div>
+                        <div class="card-desc">正在履行的合同</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-title">即将到期</div>
+                        <div class="card-number">12</div>
+                        <div class="card-desc">30天内到期合同</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-title">本月新增</div>
+                        <div class="card-number">23</div>
+                        <div class="card-desc">本月签署合同数量</div>
+                    </div>
+                </div>
+
+                <!-- 待办事项 -->
+                <div class="alert alert-warning">
+                    <strong>⚠️ 紧急提醒：</strong> 您有3个合同即将在一周内到期，请及时处理续签事宜。
+                </div>
+
+                <!-- 快速操作 -->
+                <div style="margin-top: 30px;">
+                    <h3 style="margin-bottom: 15px; color: #333;">🚀 快速操作</h3>
+                    <button class="btn btn-primary" onclick="openModal('newContractModal')">
+                        ➕ 创建新合同
+                    </button>
+                    <button class="btn btn-success" onclick="showModule('approval')">
+                        ✅ 处理审批
+                    </button>
+                    <button class="btn btn-info" onclick="showModule('templates')">
+                        📝 使用模板
+                    </button>
+                    <button class="btn btn-warning" onclick="showModule('tracking')">
+                        📈 查看跟踪
+                    </button>
+                </div>
+
+                <!-- 最近合同 -->
+                <div style="margin-top: 30px;">
+                    <h3 style="margin-bottom: 15px; color: #333;">📋 最近合同</h3>
+                    <div class="contract-item">
+                        <div class="contract-header">
+                            <div>
+                                <div class="contract-title">XX住宅小区规划设计合同</div>
+                                <div class="contract-meta">合同编号：PD2024001 | 客户：XX房地产开发有限公司 | 金额：¥2,800,000</div>
+                            </div>
+                            <div class="contract-actions">
+                                <span class="status-badge status-pending">待审批</span>
+                                <button class="btn btn-primary">审批</button>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 30%;"></div>
+                        </div>
+                        <div style="font-size: 0.9rem; color: #666;">进度：30% | 创建时间：2024-12-15 | 预计完成：2025-03-15</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 合同管理模块 -->
+            <div id="contracts" class="module">
+                <h2 style="margin-bottom: 20px; color: #333;">📄 合同管理</h2>
+                
+                <!-- 搜索和筛选 -->
+                <div class="search-bar">
+                    <input type="text" class="form-control search-input" placeholder="搜索合同名称、编号或客户...">
+                    <select class="filter-select">
+                        <option>全部状态</option>
+                        <option>草稿</option>
+                        <option>待审批</option>
+                        <option>已审批</option>
+                        <option>执行中</option>
+                        <option>已完成</option>
+                        <option>已终止</option>
+                    </select>
+                    <select class="filter-select">
+                        <option>全部类型</option>
+                        <option>规划设计合同</option>
+                        <option>咨询服务合同</option>
+                        <option>采购合同</option>
+                        <option>劳务合同</option>
+                    </select>
+                    <button class="btn btn-primary">🔍 搜索</button>
+                    <button class="btn btn-success" onclick="openModal('newContractModal')">➕ 新建合同</button>
+                </div>
+
+                <!-- 合同列表 -->
+                <div id="contract-list">
+                    <ul></ul>
+                </div>
+
+                <div class="contract-item">
+                    <div class="contract-header">
+                        <div>
+                            <div class="contract-title">XX商业综合体规划设计合同</div>
+                            <div class="contract-meta">合同编号：PD2024002 | 客户：XX商业地产集团 | 金额：¥5,200,000 | 创建：2024-12-10</div>
+                        </div>
+                        <div class="contract-actions">
+                            <span class="status-badge status-approved">已审批</span>
+                            <button class="btn btn-info">查看</button>
+                            <button class="btn btn-primary">编辑</button>
+                            <button class="btn btn-warning">跟踪</button>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 65%;"></div>
+                    </div>
+                    <div style="font-size: 0.9rem; color: #666;">进度：65% | 签署时间：2024-12-12 | 预计完成：2025-06-12</div>
+                </div>
+
+                <div class="contract-item">
+                    <div class="contract-header">
+                        <div>
+                            <div class="contract-title">XX工业园区总体规划合同</div>
+                            <div class="contract-meta">合同编号：PD2024003 | 客户：XX市政府 | 金额：¥8,800,000 | 创建：2024-12-08</div>
+                        </div>
+                        <div class="contract-actions">
+                            <span class="status-badge status-executed">执行中</span>
+                            <button class="btn btn-info">查看</button>
+                            <button class="btn btn-primary">变更</button>
+                            <button class="btn btn-warning">跟踪</button>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 45%;"></div>
+                    </div>
+                    <div style="font-size: 0.9rem; color: #666;">进度：45% | 签署时间：2024-12-09 | 预计完成：2025-12-09</div>
+                </div>
+
+                <div class="contract-item">
+                    <div class="contract-header">
+                        <div>
+                            <div class="contract-title">XX住宅区景观设计合同</div>
+                            <div class="contract-meta">合同编号：PD2024004 | 客户：XX置业有限公司 | 金额：¥1,600,000 | 创建：2024-12-05</div>
+                        </div>
+                        <div class="contract-actions">
+                            <span class="status-badge status-pending">待审批</span>
+                            <button class="btn btn-primary">审批</button>
+                            <button class="btn btn-info">查看</button>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 15%;"></div>
+                    </div>
+                    <div style="font-size: 0.9rem; color: #666;">进度：15% | 创建时间：2024-12-05 | 待审批</div>
+                </div>
+
+                <form id="contract-form">
+                    <input type="text" name="title" placeholder="合同标题" required />
+                    <input type="text" name="description" placeholder="合同描述" required />
+                    <select name="status" required>
+                        <option value="待审批">待审批</option>
+                        <option value="执行中">执行中</option>
+                    </select>
+                    <button type="submit">创建合同</button>
+                </form>
+            </div>
+
+            <!-- 新建合同模块 -->
+            <div id="new-contract" class="container">
+                <h2>创建新合同</h2>
+                <form id="contract-form">
+                    <input type="text" name="title" placeholder="合同标题" required />
+                    <input type="text" name="description" placeholder="合同描述" required />
+                    <select name="status">
+                        <option value="待审批">待审批</option>
+                        <option value="执行中">执行中</option>
+                        <option value="已完成">已完成</option>
+                    </select>
+                    <button type="submit">提交</button>
+                </form>
+            </div>
+
+            <!-- 审批流程模块 -->
+            <div id="approval" class="module">
+                <h2 style="margin-bottom: 20px; color: #333;">✅ 审批流程</h2>
+                
+                <div class="alert alert-info">
+                    <strong>📋 待处理审批：</strong> 您当前有3个合同等待审批，请及时处理以避免影响项目进度。
+                </div>
+
+                <!-- 审批流程配置 -->
+                <div style="margin-bottom: 30px;">
+                    <h3 style="margin-bottom: 15px; color: #333;">🔧 审批流程配置</h3>
+                    <div class="workflow-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">部门负责人审批</div>
+                            <div class="step-desc">业务部门负责人对合同内容进行初步审核</div>
+                        </div>
+                        <button class="btn btn-primary">配置</button>
+                    </div>
+                    <div class="workflow-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">法务部门审批</div>
+                            <div class="step-desc">法务部门对合同条款和法律风险进行审核</div>
+                        </div>
+                        <button class="btn btn-primary">配置</button>
+                    </div>
+                    <div class="workflow-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">财务部门审批</div>
+                            <div class="step-desc">财务部门对合同金额和付款条件进行审核</div>
+                        </div>
+                        <button class="btn btn-primary">配置</button>
+                    </div>
+                    <div class="workflow-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">总经理审批</div>
+                            <div class="step-desc">总经理对重大合同进行最终审批</div>
+                        </div>
+                        <button class="btn btn-primary">配置</button>
+                    </div>
+                </div>
+
+                <!-- 待审批合同 -->
+                <h3 style="margin-bottom: 15px; color: #333;">📝 待审批合同</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>合同名称</th>
+                            <th>申请人</th>
+                            <th>合同金额</th>
+                            <th>当前环节</th>
+                            <th>提交时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>XX住宅小区规划设计合同</td>
+                            <td>张三</td>
+                            <td>¥2,800,000</td>
+                            <td><span class="status-badge status-pending">法务审批</span></td>
+                            <td>2024-12-15</td>
+                            <td>
+                                <button class="btn btn-success">通过</button>
+                                <button class="btn btn-warning">驳回</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>XX市政道路规划合同</td>
+                            <td>王五</td>
+                            <td>¥4,200,000</td>
+                            <td><span class="status-badge status-pending">总经理审批</span></td>
+                            <td>2024-12-13</td>
+                            <td>
+                                <button class="btn btn-success">通过</button>
+                                <button class="btn btn-warning">驳回</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 合同模板模块 -->
+            <div id="templates" class="module">
+                <h2 style="margin-bottom: 20px; color: #333;">📝 合同模板</h2>
+                
+                <div style="margin-bottom: 20px;">
+                    <button class="btn btn-primary">➕ 新建模板</button>
+                    <button class="btn btn-info">📥 导入模板</button>
+                    <button class="btn btn-success">📤 导出模板</button>
+                </div>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🏗️</div>
+                        <div class="feature-title">规划设计合同模板</div>
+                        <div class="feature-desc">适用于城市规划、建筑设计等专业服务合同</div>
+                        <div style="margin-top: 15px;">
+                            <button class="btn btn-primary">使用模板</button>
+                            <button class="btn btn-info">编辑</button>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🏞️</div>
+                        <div class="feature-title">景观设计合同模板</div>
+                        <div class="feature-desc">专门用于景观规划设计项目的标准合同模板</div>
+                        <div style="margin-top: 15px;">
+                            <button class="btn btn-primary">使用模板</button>
+                            <button class="btn btn-info">编辑</button>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">💼</div>
+                        <div class="feature-title">咨询服务合同模板</div>
+                        <div class="feature-desc">适用于技术咨询、项目咨询等服务类合同</div>
+                        <div style="margin-top: 15px;">
+                            <button class="btn btn-primary">使用模板</button>
+                            <button class="btn btn-info">编辑</button>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🛒</div>
+                        <div class="feature-title">采购合同模板</div>
+                        <div class="feature-desc">用于设备采购、材料采购等采购类合同</div>
+                        <div style="margin-top: 15px;">
+                            <button class="btn btn-primary">使用模板</button>
+                            <button class="btn btn-info">编辑</button>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">👥</div>
+                        <div class="feature-title">劳务合同模板</div>
+                        <div class="feature-desc">适用于外包服务、临时用工等劳务合同</div>
+                        <div style="margin-top: 15px;">
+                            <button class="btn btn-primary">使用模板</button>
+                            <button class="btn btn-info">编辑</button>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🤝</div>
+                        <div class="feature-title">合作协议模板</div>
+                        <div class="feature-desc">用于战略合作、联合体合作等协议</div>
+                        <div style="margin-top: 15px;">
+                            <button class="btn btn-primary">使用模板</button>
+                            <button class="btn btn-info">编辑</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 标准条款库 -->
+                <div style="margin-top: 30px;">
+                    <h3 style="margin-bottom: 15px; color: #333;">📚 标准条款库</h3>
+                    <div class="contract-item">
+                        <div class="contract-header">
+                            <div>
+                                <div class="contract-title">付款条款</div>
+                                <div class="contract-meta">包含预付款、进度款、质保金等标准付款条款</div>
+                            </div>
+                            <div class="contract-actions">
+                                <button class="btn btn-info">查看</button>
+                                <button class="btn btn-primary">使用</button>
+                                <button class="btn btn-warning">编辑</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="contract-item">
+                        <div class="contract-header">
+                            <div>
+                                <div class="contract-title">违约责任条款</div>
+                                <div class="contract-meta">规定双方违约情况下的责任承担和赔偿标准</div>
+                            </div>
+                            <div class="contract-actions">
+                                <button class="btn btn-info">查看</button>
+                                <button class="btn btn-primary">使用</button>
+                                <button class="btn btn-warning">编辑</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="contract-item">
+                        <div class="contract-header">
+                            <div>
+                                <div class="contract-title">知识产权条款</div>
+                                <div class="contract-meta">明确设计成果的知识产权归属和使用权限</div>
+                            </div>
+                            <div class="contract-actions">
+                                <button class="btn btn-info">查看</button>
+                                <button class="btn btn-primary">使用</button>
+                                <button class="btn btn-warning">编辑</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 履行跟踪模块 -->
+            <div id="tracking" class="module">
+                <h2 style="margin-bottom: 20px; color: #333;">📈 履行跟踪</h2>
+                
+                <div class="alert alert-warning">
+                    <strong>⏰ 到期提醒：</strong> 有12个合同将在30天内到期，请关注续签情况。
+                </div>
+
+                <!-- 跟踪概览 -->
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-title">正常履行</div>
+                        <div class="card-number">142</div>
+                        <div class="card-desc">按计划正常执行</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-title">延期风险</div>
+                        <div class="card-number">14</div>
+                        <div class="card-desc">存在延期风险</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-title">逾期合同</div>
+                        <div class="card-number">3</div>
+                        <div class="card-desc">已超过约定时间</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-title">即将到期</div>
+                        <div class="card-number">12</div>
+                        <div class="card-desc">30天内到期</div>
+                    </div>
+                </div>
+
+                <!-- 关键节点提醒 -->
+                <div style="margin-top: 30px;">
+                    <h3 style="margin-bottom: 15px; color: #333;">🔔 关键节点提醒</h3>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>合同名称</th>
+                                <th>提醒类型</th>
+                                <th>到期时间</th>
+                                <th>状态</th>
+                                <th>负责人</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>XX商业综合体规划设计合同</td>
+                                <td>设计方案提交</td>
+                                <td>2024-12-25</td>
+                                <td><span class="status-badge status-pending">进行中</span></td>
+                                <td>张设计师</td>
+                                <td><button class="btn btn-info">查看</button></td>
+                            </tr>
+                            <tr>
+                                <td>XX工业园区总体规划合同</td>
+                                <td>中期付款</td>
+                                <td>2024-12-30</td>
+                                <td><span class="status-badge status-approved">已完成</span></td>
+                                <td>李财务</td>
+                                <td><button class="btn btn-info">查看</button></td>
+                            </tr>
+                            <tr>
+                                <td>XX住宅区景观设计合同</td>
+                                <td>合同到期</td>
+                                <td>2025-01-15</td>
+                                <td><span class="status-badge status-pending">待续签</span></td>
+                                <td>王经理</td>
+                                <td><button class="btn btn-warning">续签</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 履约进度跟踪 -->
+                <div style="margin-top: 30px;">
+                    <h3 style="margin-bottom: 15px; color: #333;">📊 履约进度跟踪</h3>
+                    <div class="contract-item">
+                        <div class="contract-header">
+                            <div>
+                                <div class="contract-title">XX商业综合体规划设计合同</div>
+                                <div class="contract-meta">当前阶段：方案设计 | 负责人：张设计师 | 预计完成：2025-06-12</div>
+                            </div>
+                            <div class="contract-actions">
+                                <button class="btn btn-info">详情</button>
+                                <button class="btn btn-primary">更新进度</button>
+                            </div>
+                        </div>
+                        <div style="margin: 15px 0;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span>总体进度</span>
+                                <span>65%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 65%;"></div>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+                            <div>
+                                <strong>已完成任务：</strong>
+                                <ul style="margin: 5px 0 0 20px;">
+                                    <li>现状调研</li>
+                                    <li>概念设计</li>
+                                    <li>方案优化</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <strong>进行中任务：</strong>
+                                <ul style="margin: 5px 0 0 20px;">
+                                    <li>施工图设计</li>
+                                    <li>技术交底</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <strong>待开始任务：</strong>
+                                <ul style="margin: 5px 0 0 20px;">
+                                    <li>竣工验收</li>
+                                    <li>项目交付</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 数据分析模块 -->
+            <div id="reports" class="module">
+                <h2 style="margin-bottom: 20px; color: #333;">📊 数据分析</h2>
+                
+                <!-- 统计图表 -->
+                <div class="chart-container">
+                    <div class="chart-title">📈 合同签署趋势</div>
+                    <div style="height: 300px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #666;">
+                        模拟图表：2024年月度合同签署数量趋势图
+                        <br>（实际部署时将集成真实图表库）
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px;">
+                    <div class="chart-container">
+                        <div class="chart-title">📊 合同类型分布</div>
+                        <div style="height: 250px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white;">
+                            规划设计: 45%<br>
+                            咨询服务: 25%<br>
+                            采购合同: 20%<br>
+                            其他: 10%
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-title">💰 合同金额分析</div>
+                        <div style="height: 250px; background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #333;">
+                            总金额: ¥45,680,000<br>
+                            平均金额: ¥2,930,000<br>
+                            最大金额: ¥8,800,000<br>
+                            最小金额: ¥350,000
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 报表生成 -->
+                <div style="margin-top: 30px;">
+                    <h3 style="margin-bottom: 15px; color: #333;">📋 报表生成</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                        <button class="btn btn-primary" style="padding: 20px; height: auto;">
+                            📊 合同统计报表<br>
+                            <small style="opacity: 0.8;">按时间、类型、金额统计</small>
+                        </button>
+                        <button class="btn btn-success" style="padding: 20px; height: auto;">
+                            📈 履约情况报表<br>
+                            <small style="opacity: 0.8;">履约率、违约率分析</small>
+                        </button>
+                        <button class="btn btn-info" style="padding: 20px; height: auto;">
+                            💰 财务对账报表<br>
+                            <small style="opacity: 0.8;">收付款、回款预测</small>
+                        </button>
+                        <button class="btn btn-warning" style="padding: 20px; height: auto;">
+                            ⚠️ 风险分析报表<br>
+                            <small style="opacity: 0.8;">逾期、违约风险评估</small>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 数据详情表格 -->
+                <div style="margin-top: 30px;">
+                    <h3 style="margin-bottom: 15px; color: #333;">📋 详细数据</h3>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>月份</th>
+                                <th>新增合同</th>
+                                <th>签署合同</th>
+                                <th>合同金额(万元)</th>
+                                <th>履约率</th>
+                                <th>回款率</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>2024-12</td>
+                                <td>23</td>
+                                <td>18</td>
+                                <td>1,250</td>
+                                <td>92%</td>
+                                <td>85%</td>
+                            </tr>
+                            <tr>
+                                <td>2024-11</td>
+                                <td>19</td>
+                                <td>22</td>
+                                <td>1,680</td>
+                                <td>95%</td>
+                                <td>88%</td>
+                            </tr>
+                            <tr>
+                                <td>2024-10</td>
+                                <td>31</td>
+                                <td>28</td>
+                                <td>2,120</td>
+                                <td>89%</td>
+                                <td>82%</td>
+                            </tr>
+                            <tr>
+                                <td>2024-09</td>
+                                <td>26</td>
+                                <td>24</td>
+                                <td>1,890</td>
+                                <td>94%</td>
+                                <td>90%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 系统设置模块 -->
+            <div id="settings" class="module">
+                <h2 style="margin-bottom: 20px; color: #333;">⚙️ 系统设置</h2>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <!-- 权限管理 -->
+                    <div class="feature-card">
+                        <div class="feature-icon">👥</div>
+                        <div class="feature-title">权限管理</div>
+                        <div class="feature-desc">配置用户角色和权限，控制系统访问范围</div>
+                        <div style="margin-top: 15px;">
+                            <button class="btn btn-primary" onclick="openModal('permissionModal')">配置权限</button>
+                        </div>
+                    </div>
+
+                    <!-- 电子签署设置 -->
+                    <div class="feature-card">
+                        <div class="feature-icon">✍️</div>
+                        <div class="feature-title">电子签署</div>
+                        <div class="feature-desc">集成第三方电子签名服务，支持在线签署</div>
+                        <div style="margin-top: 15px;">
+                            <button class="btn btn-primary" onclick="openModal('signatureModal')">签署设置</button>
+                        </div>
+                    </div>
+
+                    <!-- 系统集成 -->
+                    <div class="feature-card">
+                        <div class="feature-icon">🔗</div>
+                        <div class="feature-title">系统集成</div>
+                        <div class="feature-desc">与ERP、CRM、财务系统等进行数据对接</div>
+                        <div style="margin-top: 15px;">
+                            <button class="btn btn-primary" onclick="openModal('integrationModal')">集成配置</button>
+                        </div>
+                    </div>
+
+                    <!-- 数据备份 -->
+                    <div class="feature-card">
+                        <div class="feature-icon">💾</div>
+                        <div class="feature-title">数据备份</div>
+                        <div class="feature-desc">定期备份合同数据，确保数据安全</div>
+                        <div style="margin-top: 15px;">
+                            <button class="btn btn-primary" onclick="openModal('backupModal')">备份设置</button>
+                        </div>
+                    </div>
+
+                    <!-- 通知设置 -->
+                    <div class="feature-card">
+                        <div class="feature-icon">🔔</div>
+                        <div class="feature-title">通知设置</div>
+                        <div class="feature-desc">配置邮件、短信、站内消息等通知方式</div>
+                        <div style="margin-top: 15px;">
+                            <button class="btn btn-primary" onclick="openModal('notificationModal')">通知配置</button>
+                        </div>
+                    </div>
+
+                    <!-- 安全设置 -->
+                    <div class="feature-card">
+                        <div class="feature-icon">🛡️</div>
+                        <div class="feature-title">安全设置</div>
+                        <div class="feature-desc">数据加密、访问控制、审计日志等安全配置</div>
+                        <div style="margin-top: 15px;">
+                            <button class="btn btn-primary" onclick="openModal('securityModal')">安全配置</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 系统状态 -->
+                <div style="margin-top: 30px;">
+                    <h3 style="margin-bottom: 15px; color: #333;">📊 系统状态</h3>
+                    <div class="alert alert-info">
+                        <strong>✅ 系统运行正常</strong><br>
+                        • 数据库连接：正常<br>
+                        • 文件存储：正常<br>
+                        • 电子签名服务：已连接<br>
+                        • 最后备份时间：2024-12-15 02:00<br>
+                        • 在线用户：28人
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新建合同模态框 -->
+    <div id="newContractModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">📄 创建新合同</h3>
+                <span class="close" onclick="closeModal('newContractModal')">&times;</span>
+            </div>
+            <form>
+                <div class="form-group">
+                    <label>合同名称</label>
+                    <input type="text" class="form-control" placeholder="请输入合同名称">
+                </div>
+                <div class="form-group">
+                    <label>合同类型</label>
+                    <select class="form-control">
+                        <option>请选择合同类型</option>
+                        <option>规划设计合同</option>
+                        <option>咨询服务合同</option>
+                        <option>采购合同</option>
+                        <option>劳务合同</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>客户名称</label>
+                    <input type="text" class="form-control" placeholder="请输入客户名称">
+                </div>
+                <div class="form-group">
+                    <label>合同金额</label>
+                    <input type="number" class="form-control" placeholder="请输入合同金额（元）">
+                </div>
+                <div class="form-group">
+                    <label>开始日期</label>
+                    <input type="date" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>结束日期</label>
+                    <input type="date" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>项目负责人</label>
+                    <select class="form-control">
+                        <option>请选择负责人</option>
+                        <option>张三</option>
+                        <option>李四</option>
+                        <option>王五</option>
+                    </select>
+                </div>
+                <div style="text-align: right; margin-top: 20px;">
+                    <button type="button" class="btn btn-warning" onclick="closeModal('newContractModal')">取消</button>
+                    <button type="button" class="btn btn-primary">创建合同</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 权限管理模态框 -->
+    <div id="permissionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">👥 权限管理</h3>
+                <span class="close" onclick="closeModal('permissionModal')">&times;</span>
+            </div>
+            <div>
+                <h4 style="margin-bottom: 15px;">角色权限配置</h4>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>角色</th>
+                            <th>查看</th>
+                            <th>编辑</th>
+                            <th>审批</th>
+                            <th>删除</th>
+                            <th>管理</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>超级管理员</td>
+                            <td>✅</td>
+                            <td>✅</td>
+                            <td>✅</td>
+                            <td>✅</td>
+                            <td>✅</td>
+                        </tr>
+                        <tr>
+                            <td>部门经理</td>
+                            <td>✅</td>
+                            <td>✅</td>
+                            <td>✅</td>
+                            <td>❌</td>
+                            <td>❌</td>
+                        </tr>
+                        <tr>
+                            <td>业务人员</td>
+                            <td>✅</td>
+                            <td>✅</td>
+                            <td>❌</td>
+                            <td>❌</td>
+                            <td>❌</td>
+                        </tr>
+                        <tr>
+                            <td>财务人员</td>
+                            <td>✅</td>
+                            <td>❌</td>
+                            <td>✅</td>
+                            <td>❌</td>
+                            <td>❌</td>
+                        </tr>
+                        <tr>
+                            <td>法务人员</td>
+                            <td>✅</td>
+                            <td>✅</td>
+                            <td>✅</td>
+                            <td>❌</td>
+                            <td>❌</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="text-align: right; margin-top: 20px;">
+                    <button class="btn btn-primary">保存设置</button>
+                    <button class="btn btn-warning" onclick="closeModal('permissionModal')">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let currentModule = 'dashboard';
+        
+        // 模块切换功能
+        function showModule(moduleId) {
+            // 隐藏所有模块
+            document.querySelectorAll('.module').forEach(module => {
+                module.classList.remove('active');
+            });
+            
+            // 显示选中的模块
+            document.getElementById(moduleId).classList.add('active');
+            
+            // 更新导航状态
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            currentModule = moduleId;
+        }
+
+        // 模态框控制
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+    </script>
+</body>
+</html>

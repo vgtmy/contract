@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合同模板管理</title>
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>合同模板管理</h1>
+            <p>创建和管理常用合同模板</p>
+        </div>
+
+        <div class="content-area">
+            <div class="module active">
+                <div class="toolbar">
+                    <button id="createTemplate" class="btn btn-primary">新建模板</button>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" placeholder="搜索模板...">
+                    </div>
+                </div>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>模板名称</th>
+                            <th>分类</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="templateList">
+                        <!-- 模板列表将通过JS动态加载 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新建模板模态框 -->
+    <div id="templateModal" class="modal">
+        <div class="modal-content">
+            <h2>新建合同模板</h2>
+            <form id="templateForm">
+                <div class="form-group">
+                    <label for="templateName">模板名称</label>
+                    <input type="text" id="templateName" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="templateCategory">分类</label>
+                    <select id="templateCategory" class="form-control">
+                        <option value="设计">设计合同</option>
+                        <option value="施工">施工合同</option>
+                        <option value="咨询">咨询合同</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="templateContent">模板内容</label>
+                    <textarea id="templateContent" class="form-control" rows="10" required></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">保存</button>
+                    <button type="button" class="btn btn-secondary" id="cancelTemplate">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="scripts/template.js"></script>
+</body>
+</html>

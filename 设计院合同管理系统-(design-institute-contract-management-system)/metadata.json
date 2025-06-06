@@ -1,0 +1,5 @@
+{
+  "name": "设计院合同管理系统 (Design Institute Contract Management System)",
+  "description": "一个用于设计院的合同管理、审批流程、合同模板、履行跟踪、数据分析和系统设置的React Web应用程序。",
+  "requestFramePermissions": []
+}
