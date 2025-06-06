@@ -4,11 +4,21 @@ const contractController = require('../controllers/contractController');
 
 // 获取所有合同
 router.get('/', (req, res) => {
-    contractController.getAllContracts((err, contracts) => {
+    contractController.getAllContracts(req.query, (err, contracts) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
         res.json(contracts);
+    });
+});
+
+// 获取合同统计数据
+router.get('/stats', (req, res) => {
+    contractController.getContractStats((err, stats) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(stats);
     });
 });
 

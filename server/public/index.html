@@ -545,28 +545,28 @@
             .container {
                 padding: 10px;
             }
-            
+
             .header h1 {
                 font-size: 2rem;
             }
-            
+
             .dashboard-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .search-bar {
                 flex-direction: column;
             }
-            
+
             .search-input {
                 min-width: 100%;
             }
-            
+
             .contract-header {
                 flex-direction: column;
                 align-items: flex-start;
             }
-            
+
             .modal-content {
                 width: 95%;
                 margin: 10% auto;
@@ -613,27 +613,27 @@
             <!-- 工作台模块 -->
             <div id="dashboard" class="module active">
                 <h2 style="margin-bottom: 20px; color: #333;">📊 工作台概览</h2>
-                
+
                 <!-- 数据卡片 -->
                 <div class="dashboard-grid">
                     <div class="dashboard-card">
                         <div class="card-title">待审批合同</div>
-                        <div class="card-number">8</div>
+                        <div class="card-number" id="pendingApprovalCount">0</div>
                         <div class="card-desc">需要您审批的合同</div>
                     </div>
                     <div class="dashboard-card">
                         <div class="card-title">执行中合同</div>
-                        <div class="card-number">156</div>
+                        <div class="card-number" id="ongoingContractsCount">0</div>
                         <div class="card-desc">正在履行的合同</div>
                     </div>
                     <div class="dashboard-card">
                         <div class="card-title">即将到期</div>
-                        <div class="card-number">12</div>
+                        <div class="card-number" id="expiringSoonCount">0</div>
                         <div class="card-desc">30天内到期合同</div>
                     </div>
                     <div class="dashboard-card">
                         <div class="card-title">本月新增</div>
-                        <div class="card-number">23</div>
+                        <div class="card-number" id="addedThisMonthCount">0</div>
                         <div class="card-desc">本月签署合同数量</div>
                     </div>
                 </div>
@@ -646,7 +646,7 @@
                 <!-- 快速操作 -->
                 <div style="margin-top: 30px;">
                     <h3 style="margin-bottom: 15px; color: #333;">🚀 快速操作</h3>
-                    <button class="btn btn-primary" onclick="openModal('newContractModal')">
+                    <button class="btn btn-primary" onclick="openModal('newContractModal'); resetNewContractModal();">
                         ➕ 创建新合同
                     </button>
                     <button class="btn btn-success" onclick="showModule('approval')">
@@ -663,21 +663,24 @@
                 <!-- 最近合同 -->
                 <div style="margin-top: 30px;">
                     <h3 style="margin-bottom: 15px; color: #333;">📋 最近合同</h3>
-                    <div class="contract-item">
-                        <div class="contract-header">
-                            <div>
-                                <div class="contract-title">XX住宅小区规划设计合同</div>
-                                <div class="contract-meta">合同编号：PD2024001 | 客户：XX房地产开发有限公司 | 金额：¥2,800,000</div>
+                    <div id="recentContractsList">
+                        <!-- Static item below will be cleared by JS -->
+                        <div class="contract-item">
+                            <div class="contract-header">
+                                <div>
+                                    <div class="contract-title">XX住宅小区规划设计合同</div>
+                                    <div class="contract-meta">合同编号：PD2024001 | 客户：XX房地产开发有限公司 | 金额：¥2,800,000</div>
+                                </div>
+                                <div class="contract-actions">
+                                    <span class="status-badge status-pending">待审批</span>
+                                    <button class="btn btn-primary">审批</button>
+                                </div>
                             </div>
-                            <div class="contract-actions">
-                                <span class="status-badge status-pending">待审批</span>
-                                <button class="btn btn-primary">审批</button>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 30%;"></div>
                             </div>
+                            <div style="font-size: 0.9rem; color: #666;">进度：30% | 创建时间：2024-12-15 | 预计完成：2025-03-15</div>
                         </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 30%;"></div>
-                        </div>
-                        <div style="font-size: 0.9rem; color: #666;">进度：30% | 创建时间：2024-12-15 | 预计完成：2025-03-15</div>
                     </div>
                 </div>
             </div>
@@ -685,92 +688,39 @@
             <!-- 合同管理模块 -->
             <div id="contracts" class="module">
                 <h2 style="margin-bottom: 20px; color: #333;">📄 合同管理</h2>
-                
+
                 <!-- 搜索和筛选 -->
                 <div class="search-bar">
-                    <input type="text" class="form-control search-input" placeholder="搜索合同名称、编号或客户...">
-                    <select class="filter-select">
-                        <option>全部状态</option>
-                        <option>草稿</option>
-                        <option>待审批</option>
-                        <option>已审批</option>
-                        <option>执行中</option>
-                        <option>已完成</option>
-                        <option>已终止</option>
+                    <input type="text" class="form-control search-input" id="searchInput" placeholder="搜索合同名称、编号或客户...">
+                    <select class="filter-select" id="statusFilter">
+                        <option value="">全部状态</option>
+                        <option value="draft">草稿</option>
+                        <option value="pending">待审批</option>
+                        <option value="approved">已审批</option>
+                        <option value="executed">执行中</option>
+                        <option value="completed">已完成</option>
+                        <option value="terminated">已终止</option>
                     </select>
-                    <select class="filter-select">
-                        <option>全部类型</option>
-                        <option>规划设计合同</option>
-                        <option>咨询服务合同</option>
-                        <option>采购合同</option>
-                        <option>劳务合同</option>
+                    <select class="filter-select" id="typeFilter">
+                        <option value="">全部类型</option>
+                        <option value="planning_design">规划设计合同</option>
+                        <option value="consulting_service">咨询服务合同</option>
+                        <option value="procurement">采购合同</option>
+                        <option value="labor_service">劳务合同</option>
                     </select>
                     <button class="btn btn-primary">🔍 搜索</button>
-                    <button class="btn btn-success" onclick="openModal('newContractModal')">➕ 新建合同</button>
+                    <button class="btn btn-success" onclick="openModal('newContractModal'); resetNewContractModal();">➕ 新建合同</button>
                 </div>
 
                 <!-- 合同列表 -->
                 <div id="contract-list">
-                    <ul></ul>
+                    <ul>
+                        <!-- Contract items will be dynamically loaded here by main.js -->
+                    </ul>
                 </div>
+                <!-- Static contract items that were here have been removed. main.js will populate the list. -->
 
-                <div class="contract-item">
-                    <div class="contract-header">
-                        <div>
-                            <div class="contract-title">XX商业综合体规划设计合同</div>
-                            <div class="contract-meta">合同编号：PD2024002 | 客户：XX商业地产集团 | 金额：¥5,200,000 | 创建：2024-12-10</div>
-                        </div>
-                        <div class="contract-actions">
-                            <span class="status-badge status-approved">已审批</span>
-                            <button class="btn btn-info">查看</button>
-                            <button class="btn btn-primary">编辑</button>
-                            <button class="btn btn-warning">跟踪</button>
-                        </div>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 65%;"></div>
-                    </div>
-                    <div style="font-size: 0.9rem; color: #666;">进度：65% | 签署时间：2024-12-12 | 预计完成：2025-06-12</div>
-                </div>
-
-                <div class="contract-item">
-                    <div class="contract-header">
-                        <div>
-                            <div class="contract-title">XX工业园区总体规划合同</div>
-                            <div class="contract-meta">合同编号：PD2024003 | 客户：XX市政府 | 金额：¥8,800,000 | 创建：2024-12-08</div>
-                        </div>
-                        <div class="contract-actions">
-                            <span class="status-badge status-executed">执行中</span>
-                            <button class="btn btn-info">查看</button>
-                            <button class="btn btn-primary">变更</button>
-                            <button class="btn btn-warning">跟踪</button>
-                        </div>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 45%;"></div>
-                    </div>
-                    <div style="font-size: 0.9rem; color: #666;">进度：45% | 签署时间：2024-12-09 | 预计完成：2025-12-09</div>
-                </div>
-
-                <div class="contract-item">
-                    <div class="contract-header">
-                        <div>
-                            <div class="contract-title">XX住宅区景观设计合同</div>
-                            <div class="contract-meta">合同编号：PD2024004 | 客户：XX置业有限公司 | 金额：¥1,600,000 | 创建：2024-12-05</div>
-                        </div>
-                        <div class="contract-actions">
-                            <span class="status-badge status-pending">待审批</span>
-                            <button class="btn btn-primary">审批</button>
-                            <button class="btn btn-info">查看</button>
-                        </div>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 15%;"></div>
-                    </div>
-                    <div style="font-size: 0.9rem; color: #666;">进度：15% | 创建时间：2024-12-05 | 待审批</div>
-                </div>
-
-                <form id="contract-form">
+                <form id="contract-form" style="display:none;"> <!-- This form seems like a duplicate or an old version, hiding it -->
                     <input type="text" name="title" placeholder="合同标题" required />
                     <input type="text" name="description" placeholder="合同描述" required />
                     <select name="status" required>
@@ -781,10 +731,10 @@
                 </form>
             </div>
 
-            <!-- 新建合同模块 -->
-            <div id="new-contract" class="container">
+            <!-- 新建合同模块 (This seems like a duplicate section, should be removed or refactored if it was meant for a different purpose) -->
+            <div id="new-contract" class="container" style="display:none;">
                 <h2>创建新合同</h2>
-                <form id="contract-form">
+                <form id="contract-form-duplicate"> <!-- Renamed ID to avoid conflict -->
                     <input type="text" name="title" placeholder="合同标题" required />
                     <input type="text" name="description" placeholder="合同描述" required />
                     <select name="status">
@@ -799,7 +749,7 @@
             <!-- 审批流程模块 -->
             <div id="approval" class="module">
                 <h2 style="margin-bottom: 20px; color: #333;">✅ 审批流程</h2>
-                
+
                 <div class="alert alert-info">
                     <strong>📋 待处理审批：</strong> 您当前有3个合同等待审批，请及时处理以避免影响项目进度。
                 </div>
@@ -884,7 +834,7 @@
             <!-- 合同模板模块 -->
             <div id="templates" class="module">
                 <h2 style="margin-bottom: 20px; color: #333;">📝 合同模板</h2>
-                
+
                 <div style="margin-bottom: 20px;">
                     <button class="btn btn-primary">➕ 新建模板</button>
                     <button class="btn btn-info">📥 导入模板</button>
@@ -996,7 +946,7 @@
             <!-- 履行跟踪模块 -->
             <div id="tracking" class="module">
                 <h2 style="margin-bottom: 20px; color: #333;">📈 履行跟踪</h2>
-                
+
                 <div class="alert alert-warning">
                     <strong>⏰ 到期提醒：</strong> 有12个合同将在30天内到期，请关注续签情况。
                 </div>
@@ -1122,7 +1072,7 @@
             <!-- 数据分析模块 -->
             <div id="reports" class="module">
                 <h2 style="margin-bottom: 20px; color: #333;">📊 数据分析</h2>
-                
+
                 <!-- 统计图表 -->
                 <div class="chart-container">
                     <div class="chart-title">📈 合同签署趋势</div>
@@ -1231,7 +1181,7 @@
             <!-- 系统设置模块 -->
             <div id="settings" class="module">
                 <h2 style="margin-bottom: 20px; color: #333;">⚙️ 系统设置</h2>
-                
+
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
                     <!-- 权限管理 -->
                     <div class="feature-card">
@@ -1317,14 +1267,15 @@
                 <h3 class="modal-title">📄 创建新合同</h3>
                 <span class="close" onclick="closeModal('newContractModal')">&times;</span>
             </div>
-            <form>
+            <form id="newContractForm">
+                <input type="hidden" id="contractIdInput" value="">
                 <div class="form-group">
-                    <label>合同名称</label>
-                    <input type="text" class="form-control" placeholder="请输入合同名称">
+                    <label for="contractNameInput">合同名称</label>
+                    <input type="text" class="form-control" id="contractNameInput" placeholder="请输入合同名称" required>
                 </div>
                 <div class="form-group">
-                    <label>合同类型</label>
-                    <select class="form-control">
+                    <label for="contractTypeInput">合同类型</label>
+                    <select class="form-control" id="contractTypeInput">
                         <option>请选择合同类型</option>
                         <option>规划设计合同</option>
                         <option>咨询服务合同</option>
@@ -1333,24 +1284,24 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>客户名称</label>
-                    <input type="text" class="form-control" placeholder="请输入客户名称">
+                    <label for="contractClientNameInput">客户名称</label>
+                    <input type="text" class="form-control" id="contractClientNameInput" placeholder="请输入客户名称">
                 </div>
                 <div class="form-group">
-                    <label>合同金额</label>
-                    <input type="number" class="form-control" placeholder="请输入合同金额（元）">
+                    <label for="contractAmountInput">合同金额</label>
+                    <input type="number" class="form-control" id="contractAmountInput" placeholder="请输入合同金额（元）">
                 </div>
                 <div class="form-group">
-                    <label>开始日期</label>
-                    <input type="date" class="form-control">
+                    <label for="contractStartDateInput">开始日期</label>
+                    <input type="date" class="form-control" id="contractStartDateInput">
                 </div>
                 <div class="form-group">
-                    <label>结束日期</label>
-                    <input type="date" class="form-control">
+                    <label for="contractEndDateInput">结束日期</label>
+                    <input type="date" class="form-control" id="contractEndDateInput">
                 </div>
                 <div class="form-group">
-                    <label>项目负责人</label>
-                    <select class="form-control">
+                    <label for="contractProjectLeadInput">项目负责人</label>
+                    <select class="form-control" id="contractProjectLeadInput">
                         <option>请选择负责人</option>
                         <option>张三</option>
                         <option>李四</option>
@@ -1358,8 +1309,8 @@
                     </select>
                 </div>
                 <div style="text-align: right; margin-top: 20px;">
-                    <button type="button" class="btn btn-warning" onclick="closeModal('newContractModal')">取消</button>
-                    <button type="button" class="btn btn-primary">创建合同</button>
+                    <button type="button" class="btn btn-warning" onclick="closeModal('newContractModal'); resetNewContractModal();">取消</button>
+                    <button type="submit" class="btn btn-primary">创建合同</button>
                 </div>
             </form>
         </div>
@@ -1439,23 +1390,23 @@
     <script>
         // 全局变量
         let currentModule = 'dashboard';
-        
+
         // 模块切换功能
         function showModule(moduleId) {
             // 隐藏所有模块
             document.querySelectorAll('.module').forEach(module => {
                 module.classList.remove('active');
             });
-            
+
             // 显示选中的模块
             document.getElementById(moduleId).classList.add('active');
-            
+
             // 更新导航状态
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
             });
             event.target.classList.add('active');
-            
+
             currentModule = moduleId;
         }
 
@@ -1475,8 +1426,14 @@
             if (event.target.classList.contains('modal')) {
                 event.target.style.display = 'none';
                 document.body.style.overflow = 'auto';
+                if (event.target.id === 'newContractModal') { // If the newContractModal is closed by clicking outside
+                    resetNewContractModal(); // Reset its state
+                }
             }
         }
     </script>
+    <script src="scripts/main.js" defer></script>
 </body>
 </html>
+
+[end of server/public/index.html]
