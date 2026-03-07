@@ -9,7 +9,7 @@ export async function POST(request: Request) {
 
         // TODO: Connect to actual DB for verification in Step 2.
         // Mock Validation for Sprint 1 / Sprint 3 Permissions
-        let payload: any = null;
+        let payload: { userId: string, role: string, name: string, deptId?: string } | null = null;
         if (username === 'admin' && password === '123456') {
             payload = { userId: 'admin-1', role: 'ADMIN', name: '系统管理员' };
         } else if (username === 'manager' && password === '123456') {
