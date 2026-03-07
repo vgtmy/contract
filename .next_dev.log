@@ -1,0 +1,387 @@
+
+> contract-system@0.1.0 dev
+> next dev
+
+鈻?Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://198.18.0.1:3000
+- Environments: .env
+
+鉁?Starting...
+鈿?The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+鉁?Ready in 771ms
+ GET /login 200 in 413ms (compile: 196ms, proxy.ts: 67ms, render: 150ms)
+猕?Error [PrismaClientInitializationError]: `PrismaClient` needs to be constructed with a non-empty, valid `PrismaClientOptions`:
+
+```
+new PrismaClient({
+  ...
+})
+```
+
+or
+
+```
+constructor() {
+  super({ ... });
+}
+```
+          
+    at prismaClientSingleton (src\lib\db.ts:4:12)
+    at module evaluation (src\lib\db.ts:11:43)
+    at module evaluation (src\lib\logger.ts:1:1)
+    at module evaluation (src\app\api\auth\login\route.ts:3:1)
+    at Object.<anonymous> (F:\鍚堝悓绠＄悊绯荤粺\.next\dev\server\app\api\auth\login\route.js:5:3)
+  2 |
+  3 | const prismaClientSingleton = () => {
+> 4 |     return new PrismaClient()
+    |            ^
+  5 | }
+  6 |
+  7 | declare global { {
+  clientVersion: '7.4.2',
+  errorCode: undefined,
+  retryable: undefined,
+  page: '/api/auth/login'
+}
+ POST /api/auth/login 500 in 395ms (compile: 302ms, render: 93ms)
+猕?Error [PrismaClientInitializationError]: `PrismaClient` needs to be constructed with a non-empty, valid `PrismaClientOptions`:
+
+```
+new PrismaClient({
+  ...
+})
+```
+
+or
+
+```
+constructor() {
+  super({ ... });
+}
+```
+          
+    at prismaClientSingleton (src\lib\db.ts:4:12)
+    at module evaluation (src\lib\db.ts:11:43)
+    at module evaluation (src\lib\logger.ts:1:1)
+    at module evaluation (src\app\api\auth\login\route.ts:3:1)
+    at Object.<anonymous> (F:\鍚堝悓绠＄悊绯荤粺\.next\dev\server\app\api\auth\login\route.js:5:3)
+  2 |
+  3 | const prismaClientSingleton = () => {
+> 4 |     return new PrismaClient()
+    |            ^
+  5 | }
+  6 |
+  7 | declare global { {
+  clientVersion: '7.4.2',
+  errorCode: undefined,
+  retryable: undefined,
+  page: '/api/auth/login'
+}
+ POST /api/auth/login 500 in 86ms (compile: 73ms, render: 13ms)
+猕?Error [PrismaClientInitializationError]: `PrismaClient` needs to be constructed with a non-empty, valid `PrismaClientOptions`:
+
+```
+new PrismaClient({
+  ...
+})
+```
+
+or
+
+```
+constructor() {
+  super({ ... });
+}
+```
+          
+    at prismaClientSingleton (src\lib\db.ts:4:12)
+    at module evaluation (src\lib\db.ts:11:43)
+    at module evaluation (src\lib\logger.ts:1:1)
+    at module evaluation (src\app\api\auth\login\route.ts:3:1)
+    at Object.<anonymous> (F:\鍚堝悓绠＄悊绯荤粺\.next\dev\server\app\api\auth\login\route.js:5:3)
+  2 |
+  3 | const prismaClientSingleton = () => {
+> 4 |     return new PrismaClient()
+    |            ^
+  5 | }
+  6 |
+  7 | declare global { {
+  clientVersion: '7.4.2',
+  errorCode: undefined,
+  retryable: undefined,
+  page: '/api/auth/login'
+}
+ POST /api/auth/login 500 in 64ms (compile: 57ms, render: 7ms)
+猕?Error [PrismaClientInitializationError]: `PrismaClient` needs to be constructed with a non-empty, valid `PrismaClientOptions`:
+
+```
+new PrismaClient({
+  ...
+})
+```
+
+or
+
+```
+constructor() {
+  super({ ... });
+}
+```
+          
+    at prismaClientSingleton (src\lib\db.ts:4:12)
+    at module evaluation (src\lib\db.ts:11:43)
+    at module evaluation (src\lib\logger.ts:1:1)
+    at module evaluation (src\app\api\auth\login\route.ts:3:1)
+    at Object.<anonymous> (F:\鍚堝悓绠＄悊绯荤粺\.next\dev\server\app\api\auth\login\route.js:5:3)
+  2 |
+  3 | const prismaClientSingleton = () => {
+> 4 |     return new PrismaClient()
+    |            ^
+  5 | }
+  6 |
+  7 | declare global { {
+  clientVersion: '7.4.2',
+  errorCode: undefined,
+  retryable: undefined,
+  page: '/api/auth/login'
+}
+ POST /api/auth/login 500 in 60ms (compile: 51ms, render: 9ms)
+猕?Error [PrismaClientInitializationError]: `PrismaClient` needs to be constructed with a non-empty, valid `PrismaClientOptions`:
+
+```
+new PrismaClient({
+  ...
+})
+```
+
+or
+
+```
+constructor() {
+  super({ ... });
+}
+```
+          
+    at prismaClientSingleton (src\lib\db.ts:4:12)
+    at module evaluation (src\lib\db.ts:11:43)
+    at module evaluation (src\lib\logger.ts:1:1)
+    at module evaluation (src\app\api\auth\login\route.ts:3:1)
+    at Object.<anonymous> (F:\鍚堝悓绠＄悊绯荤粺\.next\dev\server\app\api\auth\login\route.js:5:3)
+  2 |
+  3 | const prismaClientSingleton = () => {
+> 4 |     return new PrismaClient()
+    |            ^
+  5 | }
+  6 |
+  7 | declare global { {
+  clientVersion: '7.4.2',
+  errorCode: undefined,
+  retryable: undefined,
+  page: '/api/auth/login'
+}
+ POST /api/auth/login 500 in 53ms (compile: 47ms, render: 6ms)
+猕?Error [PrismaClientInitializationError]: `PrismaClient` needs to be constructed with a non-empty, valid `PrismaClientOptions`:
+
+```
+new PrismaClient({
+  ...
+})
+```
+
+or
+
+```
+constructor() {
+  super({ ... });
+}
+```
+          
+    at prismaClientSingleton (src\lib\db.ts:4:12)
+    at module evaluation (src\lib\db.ts:11:43)
+    at module evaluation (src\lib\logger.ts:1:1)
+    at module evaluation (src\app\api\auth\login\route.ts:3:1)
+    at Object.<anonymous> (F:\鍚堝悓绠＄悊绯荤粺\.next\dev\server\app\api\auth\login\route.js:5:3)
+  2 |
+  3 | const prismaClientSingleton = () => {
+> 4 |     return new PrismaClient()
+    |            ^
+  5 | }
+  6 |
+  7 | declare global { {
+  clientVersion: '7.4.2',
+  errorCode: undefined,
+  retryable: undefined,
+  page: '/api/auth/login'
+}
+ POST /api/auth/login 500 in 55ms (compile: 49ms, render: 6ms)
+猕?Error [PrismaClientInitializationError]: `PrismaClient` needs to be constructed with a non-empty, valid `PrismaClientOptions`:
+
+```
+new PrismaClient({
+  ...
+})
+```
+
+or
+
+```
+constructor() {
+  super({ ... });
+}
+```
+          
+    at prismaClientSingleton (src\lib\db.ts:4:12)
+    at module evaluation (src\lib\db.ts:11:43)
+    at module evaluation (src\lib\logger.ts:1:1)
+    at module evaluation (src\app\api\auth\login\route.ts:3:1)
+    at Object.<anonymous> (F:\鍚堝悓绠＄悊绯荤粺\.next\dev\server\app\api\auth\login\route.js:5:3)
+  2 |
+  3 | const prismaClientSingleton = () => {
+> 4 |     return new PrismaClient()
+    |            ^
+  5 | }
+  6 |
+  7 | declare global { {
+  clientVersion: '7.4.2',
+  errorCode: undefined,
+  retryable: undefined,
+  page: '/api/auth/login'
+}
+ POST /api/auth/login 500 in 61ms (compile: 54ms, render: 8ms)
+猕?Error [PrismaClientInitializationError]: `PrismaClient` needs to be constructed with a non-empty, valid `PrismaClientOptions`:
+
+```
+new PrismaClient({
+  ...
+})
+```
+
+or
+
+```
+constructor() {
+  super({ ... });
+}
+```
+          
+    at prismaClientSingleton (src\lib\db.ts:4:12)
+    at module evaluation (src\lib\db.ts:11:43)
+    at module evaluation (src\lib\logger.ts:1:1)
+    at module evaluation (src\app\api\auth\login\route.ts:3:1)
+    at Object.<anonymous> (F:\鍚堝悓绠＄悊绯荤粺\.next\dev\server\app\api\auth\login\route.js:5:3)
+  2 |
+  3 | const prismaClientSingleton = () => {
+> 4 |     return new PrismaClient()
+    |            ^
+  5 | }
+  6 |
+  7 | declare global { {
+  clientVersion: '7.4.2',
+  errorCode: undefined,
+  retryable: undefined,
+  page: '/api/auth/login'
+}
+ POST /api/auth/login 500 in 55ms (compile: 48ms, render: 7ms)
+猕?Error [PrismaClientInitializationError]: `PrismaClient` needs to be constructed with a non-empty, valid `PrismaClientOptions`:
+
+```
+new PrismaClient({
+  ...
+})
+```
+
+or
+
+```
+constructor() {
+  super({ ... });
+}
+```
+          
+    at prismaClientSingleton (src\lib\db.ts:4:12)
+    at module evaluation (src\lib\db.ts:11:43)
+    at module evaluation (src\lib\logger.ts:1:1)
+    at module evaluation (src\app\api\auth\login\route.ts:3:1)
+    at Object.<anonymous> (F:\鍚堝悓绠＄悊绯荤粺\.next\dev\server\app\api\auth\login\route.js:5:3)
+  2 |
+  3 | const prismaClientSingleton = () => {
+> 4 |     return new PrismaClient()
+    |            ^
+  5 | }
+  6 |
+  7 | declare global { {
+  clientVersion: '7.4.2',
+  errorCode: undefined,
+  retryable: undefined,
+  page: '/api/auth/login'
+}
+ POST /api/auth/login 500 in 56ms (compile: 48ms, render: 7ms)
+猕?Error [PrismaClientInitializationError]: `PrismaClient` needs to be constructed with a non-empty, valid `PrismaClientOptions`:
+
+```
+new PrismaClient({
+  ...
+})
+```
+
+or
+
+```
+constructor() {
+  super({ ... });
+}
+```
+          
+    at prismaClientSingleton (src\lib\db.ts:4:12)
+    at module evaluation (src\lib\db.ts:11:43)
+    at module evaluation (src\lib\logger.ts:1:1)
+    at module evaluation (src\app\api\auth\login\route.ts:3:1)
+    at Object.<anonymous> (F:\鍚堝悓绠＄悊绯荤粺\.next\dev\server\app\api\auth\login\route.js:5:3)
+  2 |
+  3 | const prismaClientSingleton = () => {
+> 4 |     return new PrismaClient()
+    |            ^
+  5 | }
+  6 |
+  7 | declare global { {
+  clientVersion: '7.4.2',
+  errorCode: undefined,
+  retryable: undefined,
+  page: '/api/auth/login'
+}
+ POST /api/auth/login 500 in 62ms (compile: 53ms, render: 9ms)
+猕?Error [PrismaClientInitializationError]: `PrismaClient` needs to be constructed with a non-empty, valid `PrismaClientOptions`:
+
+```
+new PrismaClient({
+  ...
+})
+```
+
+or
+
+```
+constructor() {
+  super({ ... });
+}
+```
+          
+    at prismaClientSingleton (src\lib\db.ts:4:12)
+    at module evaluation (src\lib\db.ts:11:43)
+    at module evaluation (src\lib\logger.ts:1:1)
+    at module evaluation (src\app\api\auth\login\route.ts:3:1)
+    at Object.<anonymous> (F:\鍚堝悓绠＄悊绯荤粺\.next\dev\server\app\api\auth\login\route.js:5:3)
+  2 |
+  3 | const prismaClientSingleton = () => {
+> 4 |     return new PrismaClient()
+    |            ^
+  5 | }
+  6 |
+  7 | declare global { {
+  clientVersion: '7.4.2',
+  errorCode: undefined,
+  retryable: undefined,
+  page: '/api/auth/login'
+}
+ POST /api/auth/login 500 in 54ms (compile: 48ms, render: 6ms)

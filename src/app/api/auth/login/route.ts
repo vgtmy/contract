@@ -9,8 +9,6 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { username, password } = body;
 
-        // TODO: Connect to actual DB for verification in Step 2.
-        // Mock Validation for Sprint 1 / Sprint 3 Permissions
         let payload: { userId: string, role: string, name: string, deptId?: string } | null = null;
         if (username === 'admin' && password === '123456') {
             payload = { userId: 'admin-1', role: 'ADMIN', name: '系统管理员' };
@@ -21,13 +19,9 @@ export async function POST(request: Request) {
         }
 
         if (payload) {
-            // Sign JWT
             const token = await signToken(payload);
             await setSessionToken(token);
 
-            // Record Login Audit Log
-            // A bit of hack: temporarily mock a session in logAction if the auth context is just established but not globally bound yet... but logAction fetches the session. 
-            // We just call it after setSessionToken, Next.js cookies() will have the value set for request flow.
             await logAction({
                 module: 'AUTH',
                 action: 'LOGIN',
@@ -37,9 +31,7 @@ export async function POST(request: Request) {
             return NextResponse.json({
                 code: 200,
                 message: '登录成功',
-                data: {
-                    user: payload
-                }
+                data: { user: payload }
             });
 
         } else {
@@ -55,10 +47,10 @@ export async function POST(request: Request) {
                 { status: 401 }
             );
         }
-    } catch (error) {
-        console.error('Login Error:', error);
+    } catch (error: any) {
+        console.error('Login Error Full Stack:', error);
         return NextResponse.json(
-            { code: 500, message: '服务器内部错误' },
+            { code: 500, message: `服务器内部报错: ${error?.message || String(error)}` },
             { status: 500 }
         );
     }
