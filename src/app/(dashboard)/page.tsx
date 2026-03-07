@@ -36,7 +36,7 @@ export default async function DashboardPage() {
 
     const now = new Date();
 
-    allContracts.forEach((c) => {
+    allContracts.forEach((c: any) => {
         totalContractAmount += Number(c.totalAmount);
 
         // 状态切片分类计算 (依据字典)
@@ -46,9 +46,9 @@ export default async function DashboardPage() {
         else draftCount++;
 
         // 当前合同生命周期聚合
-        const cPlanSum = c.paymentPlans.reduce((acc, p) => acc + Number(p.expectedAmount), 0);
-        const cRecSum = c.receipts.reduce((acc, r) => acc + Number(r.amount), 0);
-        const cInvSum = c.invoices.reduce((acc, i) => acc + Number(i.amountAmount), 0);
+        const cPlanSum = c.paymentPlans.reduce((acc: number, p: any) => acc + Number(p.expectedAmount), 0);
+        const cRecSum = c.receipts.reduce((acc: number, r: any) => acc + Number(r.amount), 0);
+        const cInvSum = c.invoices.reduce((acc: number, i: any) => acc + Number(i.amountAmount), 0);
 
         globalPlannedSum += cPlanSum;
         globalReceiptSum += cRecSum;
@@ -62,7 +62,7 @@ export default async function DashboardPage() {
         totalMoneyWithoutInvoice += moneyWithoutInvoice;
 
         // 逾期超限计划盘点
-        c.paymentPlans.forEach(p => {
+        c.paymentPlans.forEach((p: any) => {
             if (p.status !== 'RECEIVED') {
                 if (p.expectedDate && new Date(p.expectedDate) < now) {
                     overduePlanCount++;

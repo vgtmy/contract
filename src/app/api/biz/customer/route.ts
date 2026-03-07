@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
-import { Prisma } from '@prisma/client';
 
 export async function GET(request: Request) {
     try {
@@ -13,7 +12,7 @@ export async function GET(request: Request) {
         const type = searchParams.get('type');
         const creditLevel = searchParams.get('creditLevel');
 
-        const where: Prisma.CustomerWhereInput = {};
+        const where: any = {};
         if (name) where.name = { contains: name };
         if (type) where.type = type;
         if (creditLevel) where.creditLevel = creditLevel;

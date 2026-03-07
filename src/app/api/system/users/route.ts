@@ -35,10 +35,10 @@ export async function GET(request: Request) {
         });
 
         // Format output to flatten roles
-        const formattedUsers = users.map(u => ({
+        const formattedUsers = users.map((u: any) => ({
             ...u,
             password: '', // Never return password hash
-            roles: u.userRoles.map(ur => ur.role)
+            roles: u.userRoles.map((ur: any) => ur.role)
         }));
 
         return NextResponse.json({ code: 200, data: formattedUsers, message: 'success' });

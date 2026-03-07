@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
-import { Prisma } from '@prisma/client';
 
 export async function GET(request: Request) {
     try {
@@ -13,7 +12,7 @@ export async function GET(request: Request) {
         const customerId = searchParams.get('customerId');
         const status = searchParams.get('status');
 
-        const where: Prisma.ProjectWhereInput = {};
+        const where: any = {};
         if (name) where.name = { contains: name };
         if (customerId) where.customerId = customerId;
         if (status) where.status = status;

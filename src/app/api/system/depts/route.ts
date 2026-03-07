@@ -15,11 +15,11 @@ export async function GET(request: Request) {
             const deptMap: Record<string, any> = {};
             const tree: any[] = [];
 
-            depts.forEach(d => {
+            depts.forEach((d: any) => {
                 deptMap[d.id] = { ...d, children: [] };
             });
 
-            depts.forEach(d => {
+            depts.forEach((d: any) => {
                 if (d.parentId && deptMap[d.parentId]) {
                     deptMap[d.parentId].children.push(deptMap[d.id]);
                 } else {
