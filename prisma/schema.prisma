@@ -1,0 +1,282 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// 1. 部门表 (支持树形结构)
+model Dept {
+  id        String   @id @default(uuid())
+  name      String   // 部门名称 (如：市政规划一所)
+  parentId  String?  // 父级部门 ID (顶层为空)
+  managerId String?  // 部门负责人 ID (选填，对应 User ID)
+  sort      Int      @default(0) // 排序号
+  
+  users     User[]   // 此部门下的员工集合
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("sys_dept")
+}
+
+// 2. 角色表
+model Role {
+  id          String   @id @default(uuid())
+  code        String   @unique // 角色编码 (如：PM, FINANCE)
+  name        String   // 角色显示名 (如：项目经理, 财务专员)
+  description String?  // 职责描述
+  
+  userRoles   UserRole[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("sys_role")
+}
+
+// 3. 用户表
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique // 登录名/工号
+  password  String   // bcrypt hash 处理后的密码
+  name      String   // 真实姓名 (如：张三)
+  status    Int      @default(1) // 1=正常, 0=停用
+  
+  deptId    String?  // 冗余所属主要部门
+  dept      Dept?    @relation(fields: [deptId], references: [id])
+  
+  userRoles UserRole[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("sys_user")
+}
+
+// 4. 用户与角色多对多映射表
+model UserRole {
+  userId    String
+  roleId    String
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  
+  @@id([userId, roleId]) // 联合主键
+  @@map("sys_user_role")
+}
+
+// 4.5. 审计日志表 (Sprint 5)
+model SysAuditLog {
+  id           String   @id @default(uuid())
+  
+  operatorId   String   // 操作人ID
+  operatorName String   // 操作人姓名
+  deptName     String?  // 冗余操作时所处部门
+  role         String?  // 冗余操作时所处防线角色
+  
+  module       String   // 操作模块 (AUTH, CONTRACT, RECEIPT, INVOICE, PAYMENT_PLAN, FILE, EXPORT)
+  actionType   String   // 动作 (LOGIN, CREATE, UPDATE, DELETE, EXPORT)
+  targetId     String?  // 遭受操作的目标实体主键
+  
+  summary      String   // 短文本动作摘要 (如 "删除了30万金额的收款计划")
+  result       String   @default("SUCCESS") // 留痕结果：SUCCESS，FAIL
+  
+  actionTime   DateTime @default(now()) // 时间锚点
+  
+  @@map("sys_audit_log")
+}
+
+// 5. 客户档案表 (Sprint 2)
+model Customer {
+  id            String   @id @default(uuid())
+  name          String   @unique // 客户名称 (如：XX市自然资源和规划局)
+  type          String   // 客户性质 (如：政府机关, 事业单位, 国有企业, 民营企业等)
+  creditLevel   String   @default("A") // 信用评级 (如：A, B, C, D)
+  contactPerson String?  // 核心对接人姓名
+  contactPhone  String?  // 对接人联系电话
+  taxNumber     String?  // 统一社会信用代码/税号
+  address       String?  // 单位详细地址
+  
+  projects      Project[]
+  contracts     Contract[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("biz_customer")
+}
+
+// 6. 项目立项表 (Sprint 2)
+model Project {
+  id          String    @id @default(uuid())
+  serialNo    String    @unique // 项目编号 (如：XM-2026-001)
+  name        String    // 项目名称
+  type        String    // 项目类型 (如：市政工程, 景观园林, 建筑规划)
+  
+  customerId  String
+  customer    Customer  @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  
+  deptId      String    // 承办部门 ID
+  deptName    String    // 承办部门名称
+  pmId        String    // 项目负责人(PM) ID
+  pmName      String    // 项目负责人名称
+  
+  status      String    @default("ACTIVE") // 状态：ACTIVE进行中, PAUSED暂停, CLOSED结项
+  budget      Decimal   @default(0) // 预计产值/预算
+  
+  startDate   DateTime? // 计划开始日期
+  endDate     DateTime? // 计划结束日期
+  remark      String?   // 备注说明
+  
+  contracts   Contract[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("biz_project")
+}
+
+// 7. 合同主表 (Sprint 3 核心)
+model Contract {
+  id             String   @id @default(uuid())
+  serialNo       String   @unique // 合同编号
+  name           String   // 合同名称
+  type           String   // 合同类型 (规划设计/专项咨询等)
+  totalAmount    Decimal  @default(0) // 合同金额
+  
+  signDate       DateTime? // 签订日期
+  startDate      DateTime? // 开始日期
+  endDate        DateTime? // 结束日期
+  
+  taxRate        Decimal?  @default(0) // 税率 (%)
+  remark         String?   // 备注/摘要
+  
+  status         String   @default("DRAFT") // 状态：DRAFT草稿, PROCESS审批中, ACTIVE履行中, CLOSED已结案
+  
+  customerId     String   // 甲方的绑定
+  customer       Customer @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  
+  projectId      String?  // 关联的大项目（选填）
+  project        Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  
+  pmId           String   // 项目经理(当前负责人)，用于【本人】权限
+  pmName         String   // 冗余显示
+  deptId         String   // 所属部门，用于【本部门】权限
+  deptName       String   // 冗余显示
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  paymentPlans   PaymentPlan[]
+  files          ContractFile[]
+  receipts       ReceiptRecord[]
+  invoices       InvoiceRecord[]
+
+  @@map("biz_contract")
+}
+
+// 8. 收款计划/付款计划表 (Sprint 3 收款节点)
+model PaymentPlan {
+  id              String   @id @default(uuid())
+  
+  contractId      String   // 所属合同
+  contract        Contract @relation(fields: [contractId], references: [id], onDelete: Cascade) // 合同删除时级联删除计划
+  
+  phase           String   // 期次说明 (如：第一期/首付款)
+  expectedAmount  Decimal  @default(0) // 计划收款金额
+  expectedDate    DateTime? // 计划收款日期(节点计算基准)
+  condition       String?  // 收款条件/里程碑说明 (如：完成可研评审)
+  status          String   @default("UNMET") // 状态：UNMET未到期, PENDING待收款, RECEIVED已收款, OVERDUE逾期
+  remark          String?  // 备注
+  
+  // 暂时屏蔽通过发票核销实收金额的复杂逻辑，本期只专注“计划”维度。
+  // actualAmount Decimal @default(0) 
+
+  receipts        ReceiptRecord[] // 可选的关联实收款记录
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("biz_payment_plan")
+}
+
+// 9. 合同附件归档表 (Sprint 3 电子档案)
+model ContractFile {
+  id              String   @id @default(uuid())
+  
+  contractId      String   
+  contract        Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  
+  name            String   // 附件原名
+  category        String   // 附件分类 (如：合同原稿, 盖章终版, 图纸/技术附件)
+  fileSize        Int      @default(0) // 文件大小 (字节)
+  fileUrl         String   // 存储路径或访问标识 (如：/uploads/xxx.pdf)
+  
+  uploaderId      String   // 上传人ID (冗余关联)
+  uploaderName    String   // 上传人姓名
+  
+  remark          String?  // 备注说明
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("biz_contract_file")
+}
+
+// 10. 实收款记录表 (Sprint 4)
+model ReceiptRecord {
+  id              String   @id @default(uuid())
+  
+  contractId      String   // 强关联至合同
+  contract        Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  
+  planId          String?  // 弱关联至具体某期计划（可为空，表示不明确期次的先期打款）
+  plan            PaymentPlan? @relation(fields: [planId], references: [id], onDelete: SetNull)
+
+  amount          Decimal  @default(0) // 实际到账金额
+  receiptDate     DateTime // 收款/确权日期
+  
+  paymentMethod   String   @default("BANK_TRANSFER") // 收款方式：银行转账, 承兑汇票, 现金等
+  voucherNo       String?  // 财务流水号或凭证号
+  
+  handlerId       String   // 经办人ID
+  handlerName     String   // 经办人姓名 (冗余)
+  
+  remark          String?  // 到账说明或备注
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("biz_receipt_record")
+}
+
+// 11. 发票台账记录表 (Sprint 4)
+model InvoiceRecord {
+  id              String   @id @default(uuid())
+  
+  contractId      String   // 强关联至合同
+  contract        Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  
+  invoiceNo       String   // 发票号码/段位
+  invoiceType     String   @default("VAT_SPECIAL") // 发票类型: VAT_SPECIAL(增值税专用), VAT_ORDINARY(增值税普通)等
+  
+  amountAmount    Decimal  @default(0) // 开票总金额(含税)
+  taxRate         Decimal  @default(0) // 开票依据税率(%)
+  taxAmount       Decimal  @default(0) // 剥离出的税额 (冗余字段供快速核算)
+  
+  billingDate     DateTime // 开票日期
+  title           String?  // 发票抬头 (冗余或可修改，以防甲方分公司代付变更)
+  
+  remark          String?  // 摘要/备注
+  
+  handlerId       String   // 经办人ID
+  handlerName     String   // 开票人姓名
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("biz_invoice_record")
+}
