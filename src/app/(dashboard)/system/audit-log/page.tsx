@@ -42,7 +42,7 @@ export default function AuditLogPage() {
                 ...(endDate && { endDate: endDate + 'T23:59:59.999Z' }),
             });
 
-            const res = await fetch(`/api/sys/audit-log?${params.toString()}`);
+            const res = await fetch(`/api/system/audit-log?${params.toString()}`);
             if (res.status === 401) {
                 window.location.href = '/login';
                 return;

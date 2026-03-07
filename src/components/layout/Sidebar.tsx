@@ -40,7 +40,7 @@ const Sidebar = () => {
           <Link href="/system/users" className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-800 text-gray-300 hover:text-white transition-colors">
             组织与人员
           </Link>
-          <Link href="/sys/audit-log" className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-800 text-gray-300 hover:text-white transition-colors text-orange-400/80 hover:text-orange-400">
+          <Link href="/system/audit-log" className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-800 text-gray-300 hover:text-white transition-colors text-orange-400/80 hover:text-orange-400">
             审计与安全留痕
           </Link>
         </nav>
