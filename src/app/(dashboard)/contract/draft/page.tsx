@@ -183,7 +183,7 @@ export default function ContractDraftPage() {
                 </div>
 
                 {/* ========= STEP 2 ========= */}
-                <div className="pt-8 space-y-6 sm:space-y-5">
+                <div className="pt-8 space-y-6 sm:space-y-5 relative">
                     <div className="flex justify-between items-center relative">
                         <h4 className="text-lg font-medium text-gray-900 border-l-4 border-blue-500 pl-2">
                             第二步：拟定标的契约
