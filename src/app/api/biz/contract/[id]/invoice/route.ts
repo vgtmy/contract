@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { logAction } from '@/lib/logger';
 
+export const dynamic = 'force-dynamic';
+
 export async function PUT(request: Request) {
     try {
         const body = await request.json();

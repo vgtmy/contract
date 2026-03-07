@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { logAction } from '@/lib/logger';
 
+export const dynamic = 'force-dynamic';
+
 export async function PUT(request: Request, context: any) {
     try {
         // Here context.params.id is the contractId because of file path, 

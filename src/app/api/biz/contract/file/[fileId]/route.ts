@@ -3,6 +3,8 @@ import prisma from '@/lib/db';
 import { unlink } from 'fs/promises';
 import path from 'path';
 
+export const dynamic = 'force-dynamic';
+
 export async function DELETE(request: Request, context: any) {
     try {
         const fileId = (await context.params).fileId;

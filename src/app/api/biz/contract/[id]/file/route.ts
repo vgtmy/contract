@@ -5,6 +5,8 @@ import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { logAction } from '@/lib/logger';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request, context: any) {
     try {
         const contractId = (await context.params).id;
