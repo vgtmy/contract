@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ProTable, Column } from '@/components/common/ProTable';
 import { FilterBar, FilterItem } from '@/components/common/FilterBar';
+import { Modal } from '@/components/common/Modal';
+// import { Feedback } from '@/components/common/Feedback'; // Removed due to missing export
 
 interface UserItem {
     id: string;
@@ -16,25 +18,47 @@ interface UserItem {
 }
 
 export default function UsersPage() {
+    // 数据与状态
     const [data, setData] = useState<UserItem[]>([]);
     const [loading, setLoading] = useState(false);
     const [depts, setDepts] = useState<any[]>([]);
+    const [roles, setRoles] = useState<any[]>([]);
 
-    // Filters
-    const [username, setUsername] = useState('');
-    const [deptId, setDeptId] = useState('');
+    // 搜索过滤状态
+    const [usernameSearch, setUsernameSearch] = useState('');
+    const [deptIdSearch, setDeptIdSearch] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
+
+    // 弹窗状态
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [currentUser, setCurrentUser] = useState<Partial<UserItem> | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // 表单状态 (基础简单处理)
+    const [formData, setFormData] = useState({
+        username: '',
+        name: '',
+        password: '',
+        deptId: '',
+        status: 1,
+        roleIds: [] as string[]
+    });
 
     const fetchDepts = async () => {
         try {
             const res = await fetch('/api/system/depts');
             const json = await res.json();
-            if (res.ok && json.data) {
-                setDepts(json.data);
-            }
-        } catch (e) {
-            console.error('Failed to fetch departments', e);
-        }
+            if (res.ok && json.data) setDepts(json.data);
+        } catch (e) { console.error('Failed to fetch depts', e); }
+    };
+
+    const fetchRoles = async () => {
+        try {
+            const res = await fetch('/api/system/roles');
+            const json = await res.json();
+            if (res.ok && json.data) setRoles(json.data);
+        } catch (e) { console.error('Failed to fetch roles', e); }
     };
 
     const fetchData = useCallback(async () => {
@@ -42,43 +66,78 @@ export default function UsersPage() {
         setErrorMsg('');
         try {
             const params = new URLSearchParams({
-                ...(username && { username }),
-                ...(deptId && { deptId }),
+                ...(usernameSearch && { username: usernameSearch }),
+                ...(deptIdSearch && { deptId: deptIdSearch }),
             });
-
             const res = await fetch(`/api/system/users?${params.toString()}`);
-            if (res.status === 401) {
-                window.location.href = '/login';
-                return;
-            }
+            if (res.status === 401) { window.location.href = '/login'; return; }
             const json = await res.json();
-            if (res.ok && json.data) {
-                setData(json.data);
-            } else {
-                setErrorMsg(json.message || '获取数据失败');
-            }
-        } catch (e) {
-            console.error('Failed to fetch users', e);
-            setErrorMsg('网络阻断加载失败');
-        } finally {
-            setLoading(false);
-        }
-    }, [username, deptId]);
+            if (res.ok && json.data) setData(json.data);
+            else setErrorMsg(json.message || '获取数据失败');
+        } catch (e) { setErrorMsg('网络加载异常'); }
+        finally { setLoading(false); }
+    }, [usernameSearch, deptIdSearch]);
 
     useEffect(() => {
         fetchDepts();
+        fetchRoles();
         fetchData();
-    }, []);
+    }, [fetchData]);
 
-    const handleSearch = () => {
-        fetchData();
+    // 操作处理
+    const handleAdd = () => {
+        setFormData({ username: '', name: '', password: '', deptId: '', status: 1, roleIds: [] });
+        setIsAddModalOpen(true);
     };
 
-    const handleReset = () => {
-        setUsername('');
-        setDeptId('');
-        // We use a small timeout to let the state clear before fetching
-        setTimeout(fetchData, 0);
+    const handleEdit = (user: UserItem) => {
+        setCurrentUser(user);
+        setFormData({
+            username: user.username,
+            name: user.name,
+            password: '', // 密码不回填
+            deptId: user.deptId || '',
+            status: user.status,
+            roleIds: user.roles.map(r => r.id)
+        });
+        setIsEditModalOpen(true);
+    };
+
+    const handleDisable = async (user: UserItem) => {
+        if (!confirm(`确定要停用用户 [${user.name}] 吗？停用后该用户将无法进入系统。`)) return;
+        try {
+            const res = await fetch(`/api/system/users/${user.id}`, { method: 'DELETE' });
+            const json = await res.json();
+            if (res.ok) {
+                alert('已禁用');
+                fetchData();
+            } else {
+                alert(json.message);
+            }
+        } catch (e) { alert('提交失败'); }
+    };
+
+    const handleSubmit = async (type: 'add' | 'edit') => {
+        setIsSubmitting(true);
+        try {
+            const url = type === 'add' ? '/api/system/users' : `/api/system/users/${currentUser?.id}`;
+            const method = type === 'add' ? 'POST' : 'PUT';
+            const res = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+            const json = await res.json();
+            if (res.ok) {
+                alert(type === 'add' ? (json.data._tempPassword ? `创建成功！临时密码：${json.data._tempPassword}` : '创建成功') : '修改成功');
+                setIsAddModalOpen(false);
+                setIsEditModalOpen(false);
+                fetchData();
+            } else {
+                alert(json.message);
+            }
+        } catch (e) { alert('请求失败'); }
+        finally { setIsSubmitting(false); }
     };
 
     const columns: Column<UserItem>[] = [
@@ -86,115 +145,188 @@ export default function UsersPage() {
             key: 'username',
             title: '工号/账号',
             width: '120px',
-            render: (record) => (
-                <span className="font-mono font-bold text-blue-600">{record.username}</span>
-            )
+            render: (r) => <span className="font-mono font-bold text-blue-600">{r.username}</span>
         },
         {
             key: 'name',
             title: '姓名',
             width: '120px',
-            render: (record) => (
-                <span className="font-medium text-gray-900">{record.name}</span>
-            )
+            render: (r) => <span className="font-medium text-gray-900">{r.name}</span>
         },
         {
             key: 'dept',
             title: '所属部门',
             width: '180px',
-            render: (record) => (
-                <span className="text-gray-600 text-sm">{record.dept?.name || '未分配部门'}</span>
-            )
+            render: (r) => <span className="text-gray-600 text-sm">{r.dept?.name || '未分配部门'}</span>
         },
         {
             key: 'roles',
-            title: '分配角色',
-            render: (record) => (
+            title: '角色权限',
+            render: (r) => (
                 <div className="flex flex-wrap gap-1">
-                    {record.roles.map(role => (
-                        <span key={role.id} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800">
-                            {role.name}
-                        </span>
+                    {r.roles.map(role => (
+                        <span key={role.id} className="px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800">{role.name}</span>
                     ))}
-                    {record.roles.length === 0 && <span className="text-gray-400 text-xs italic">无角色</span>}
                 </div>
             )
         },
         {
             key: 'status',
-            title: '账户状态',
+            title: '状态',
             width: '100px',
             align: 'center',
-            render: (record) => (
-                record.status === 1
-                    ? <span className="flex items-center justify-center text-green-600 text-xs font-bold bg-green-50 px-2 py-1 rounded-full border border-green-100 italic">ACTIVE</span>
-                    : <span className="flex items-center justify-center text-red-400 text-xs font-bold bg-gray-50 px-2 py-1 rounded-full border border-gray-100">DISABLED</span>
+            render: (r) => (
+                r.status === 1 
+                    ? <span className="text-green-600 text-xs font-bold bg-green-50 px-2 py-1 rounded-full border border-green-100">正常</span>
+                    : <span className="text-red-400 text-xs font-bold bg-gray-50 px-2 py-1 rounded-full border border-gray-100">禁用</span>
             )
         },
         {
-            key: 'createdAt',
-            title: '建档时间',
+            key: 'action',
+            title: '操作',
             width: '150px',
-            render: (record) => (
-                <span className="text-gray-400 text-xs">
-                    {new Date(record.createdAt).toLocaleDateString()}
-                </span>
+            align: 'right',
+            render: (r) => (
+                <div className="flex justify-end space-x-2">
+                    <button onClick={() => handleEdit(r)} className="text-blue-600 hover:text-blue-900 text-xs font-bold">编辑</button>
+                    {r.status === 1 && <button onClick={() => handleDisable(r)} className="text-red-600 hover:text-red-900 text-xs font-bold">禁用</button>}
+                </div>
             )
         }
     ];
 
     return (
         <div className="space-y-4">
-            <div className="mb-6">
-                <h1 className="text-2xl font-bold text-gray-900">组织与人员管理</h1>
-                <p className="text-sm text-gray-500 mt-1">管理系统内部员工账号、部门归属、以及职责角色的核心元数据面板。</p>
+            <div className="flex justify-between items-end">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900">人员基座管理</h1>
+                    <p className="text-sm text-gray-500 mt-1">负责全院员工的入职建档、职责分配以及数字身份的安全管控。</p>
+                </div>
+                <button
+                    onClick={handleAdd}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow-sm text-sm font-bold transition flex items-center"
+                >
+                    <span className="mr-1">+</span> 入职新员工
+                </button>
             </div>
 
-            <FilterBar onSearch={handleSearch} onReset={handleReset} loading={loading}>
-                <FilterItem label="工号/账号搜索">
-                    <input
-                        type="text"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm sm:text-sm focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="输入工号精确匹配"
-                    />
+            <FilterBar onSearch={fetchData} onReset={() => { setUsernameSearch(''); setDeptIdSearch(''); setTimeout(fetchData, 0); }} loading={loading}>
+                <FilterItem label="工号/账号">
+                    <input type="text" value={usernameSearch} onChange={e => setUsernameSearch(e.target.value)} className="w-full px-3 py-2 border rounded-md sm:text-sm" placeholder="全匹配搜索" />
                 </FilterItem>
-                <FilterItem label="按部门筛选">
-                    <select
-                        value={deptId}
-                        onChange={(e) => setDeptId(e.target.value)}
-                        className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm sm:text-sm focus:ring-blue-500 focus:border-blue-500"
-                    >
+                <FilterItem label="所属部门">
+                    <select value={deptIdSearch} onChange={e => setDeptIdSearch(e.target.value)} className="w-full px-3 py-2 border rounded-md sm:text-sm">
                         <option value="">全部部门</option>
-                        {depts.map(d => (
-                            <option key={d.id} value={d.id}>{d.name}</option>
-                        ))}
+                        {depts.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
                     </select>
                 </FilterItem>
             </FilterBar>
 
-            {errorMsg && (
-                <div className="bg-red-50 border border-red-100 p-4 rounded-md text-sm text-red-600 mb-4 font-medium">
-                    {errorMsg}
-                </div>
-            )}
+            <ProTable columns={columns} dataSource={data} loading={loading} rowKey={r => r.id} />
 
-            <ProTable
-                columns={columns}
-                dataSource={data}
-                loading={loading}
-                rowKey={(record) => record.id}
-                emptyText="未检索到任何符合条件的员工档案"
-            />
+            {/* 编辑/新增弹窗内容 */}
+            <Modal
+                isOpen={isAddModalOpen || isEditModalOpen}
+                onClose={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }}
+                title={isAddModalOpen ? '入职登记 (新增用户)' : `档案修改 - ${currentUser?.name}`}
+                footer={
+                    <>
+                        <button onClick={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">取消</button>
+                        <button 
+                            disabled={isSubmitting} 
+                            onClick={() => handleSubmit(isAddModalOpen ? 'add' : 'edit')} 
+                            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 disabled:opacity-50"
+                        >
+                            {isSubmitting ? '保存中...' : '提交存档'}
+                        </button>
+                    </>
+                }
+            >
+                <div className="space-y-4 py-2">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-xs font-bold text-gray-700 mb-1">工号/登录账号 <span className="text-red-500">*</span></label>
+                            <input
+                                disabled={isEditModalOpen}
+                                type="text"
+                                value={formData.username}
+                                onChange={e => setFormData({ ...formData, username: e.target.value })}
+                                className="w-full px-3 py-2 border rounded-md text-sm bg-gray-50 focus:bg-white"
+                                placeholder="如: admin"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold text-gray-700 mb-1">真实姓名 <span className="text-red-500">*</span></label>
+                            <input
+                                type="text"
+                                value={formData.name}
+                                onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                className="w-full px-3 py-2 border rounded-md text-sm"
+                                placeholder="输入员工实名"
+                            />
+                        </div>
+                    </div>
 
-            <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-100 flex items-start space-x-3">
-                <span className="text-blue-500 mt-0.5">💡</span>
-                <div className="text-xs text-blue-700 leading-relaxed">
-                    <p className="font-bold mb-1">管理员提示：</p>
-                    <p>当前版本仅支持数据查询与穿透展示。人员的新增、角色调拨、以及部门迁徙等原子化写操作功能将在下一迭代周期（Sprint 6）正式入库启用。</p>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-xs font-bold text-gray-700 mb-1">所属行政部门</label>
+                            <select
+                                value={formData.deptId}
+                                onChange={e => setFormData({ ...formData, deptId: e.target.value })}
+                                className="w-full px-3 py-2 border rounded-md text-sm"
+                            >
+                                <option value="">未分配 (暂不挂载)</option>
+                                {depts.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold text-gray-700 mb-1">在职状态</label>
+                            <select
+                                value={formData.status}
+                                onChange={e => setFormData({ ...formData, status: Number(e.target.value) })}
+                                className="w-full px-3 py-2 border rounded-md text-sm"
+                            >
+                                <option value={1}>✅ 正常 (可正常搬砖)</option>
+                                <option value={0}>❌ 停用 (禁止系统访问)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-bold text-gray-700 mb-1">登录密码 {isEditModalOpen && <span className="text-blue-500 text-[10px] font-normal">(若无需修改请留空)</span>}</label>
+                        <input
+                            type="password"
+                            value={formData.password}
+                            onChange={e => setFormData({ ...formData, password: e.target.value })}
+                            className="w-full px-3 py-2 border rounded-md text-sm"
+                            placeholder={isEditModalOpen ? "输入新密码进行强制重置" : "留空则自动生成 8 位临时密码"}
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-bold text-gray-700 mb-2">映射权限角色 <span className="text-gray-400 text-[10px] uppercase font-normal">(多选)</span></label>
+                        <div className="flex flex-wrap gap-2 p-3 bg-gray-50 rounded-lg border border-dashed border-gray-200">
+                            {roles.map(role => (
+                                <label key={role.id} className="flex items-center space-x-2 cursor-pointer group">
+                                    <input
+                                        type="checkbox"
+                                        checked={formData.roleIds.includes(role.id)}
+                                        onChange={e => {
+                                            const newRoleIds = e.target.checked
+                                                ? [...formData.roleIds, role.id]
+                                                : formData.roleIds.filter(id => id !== role.id);
+                                            setFormData({ ...formData, roleIds: newRoleIds });
+                                        }}
+                                        className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                    />
+                                    <span className="text-sm text-gray-700 group-hover:text-blue-600 transition">{role.name}</span>
+                                </label>
+                            ))}
+                            {roles.length === 0 && <span className="text-xs text-gray-400 italic">尚未配置系统角色</span>}
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </Modal>
         </div>
     );
 }

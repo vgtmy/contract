@@ -10,8 +10,10 @@ const getJwtSecretKey = () => {
 
 export interface TokenPayload {
     userId: string;
-    role: string;
+    role: string;      // ADMIN | MANAGER | PM
     name: string;
+    deptId?: string;   // 所属部门 ID（ADMIN 为空，全局可见）
+    deptName?: string; // 部门名称（冗余）
 }
 
 export async function signToken(payload: TokenPayload): Promise<string> {

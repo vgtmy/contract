@@ -56,3 +56,17 @@ export const ErrorState: React.FC<{ message?: string, onRetry?: () => void }> = 
         </div>
     );
 };
+// ---------------------------
+// 4. Feedback 控制对象 (Toast 模拟)
+// ---------------------------
+export const Feedback = {
+    success: (msg: string) => {
+        if (typeof window !== 'undefined') alert(`✅ ${msg}`);
+    },
+    error: (msg: string) => {
+        if (typeof window !== 'undefined') alert(`❌ ${msg}`);
+    },
+    info: (msg: string) => {
+        if (typeof window !== 'undefined') console.log(`ℹ️ ${msg}`);
+    }
+};

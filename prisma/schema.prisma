@@ -15,6 +15,8 @@ model Dept {
   managerId String?  // 部门负责人 ID (选填，对应 User ID)
   sort      Int      @default(0) // 排序号
   
+  status    Int      @default(1) // 1=正常, 0=停用 (逻辑禁用)
+  
   users     User[]   // 此部门下的员工集合
   
   createdAt DateTime @default(now())
@@ -31,11 +33,44 @@ model Role {
   description String?  // 职责描述
   
   userRoles   UserRole[]
+  roleMenus   RoleMenu[]
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
   @@map("sys_role")
+}
+
+// 4. 菜单与权限表 (支持树形结构)
+model Menu {
+  id          String   @id @default(uuid())
+  parentId    String?  // 父级 ID
+  name        String   // 菜单名称
+  type        String   // 类型: DIR目录, MENU菜单, BUTTON按钮
+  path        String?  // 路由路径 (菜单特有)
+  permCode    String?  // 权限标识 (如 sys:user:add)
+  icon        String?  // 图标
+  sort        Int      @default(0) // 排序号
+  status      Int      @default(1) // 1=正常, 0=停用
+  
+  roleMenus   RoleMenu[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("sys_menu")
+}
+
+// 5. 角色与菜单权限映射表
+model RoleMenu {
+  roleId    String
+  menuId    String
+  
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  menu      Menu     @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  
+  @@id([roleId, menuId])
+  @@map("sys_role_menu")
 }
 
 // 3. 用户表

@@ -113,8 +113,8 @@ export default async function DashboardPage() {
                         <span className="text-sm font-medium text-gray-400 mr-1">￥</span>{globalReceiptSum.toLocaleString()}
                     </p>
                     <div className="flex justify-between text-xs text-green-600 font-medium">
-                        <span>回款回收率</span>
-                        <span>{totalContractAmount ? ((globalReceiptSum / totalContractAmount) * 100).toFixed(1) : 0}%</span>
+                        <span>占计划比率 (闭环率)</span>
+                        <span>{globalPlannedSum ? ((globalReceiptSum / globalPlannedSum) * 100).toFixed(1) : 0}%</span>
                     </div>
                 </div>
 

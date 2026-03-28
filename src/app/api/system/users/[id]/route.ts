@@ -2,56 +2,79 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import bcrypt from 'bcryptjs';
 
-export const dynamic = 'force-dynamic';
-
-export async function PUT(request: Request, context: any) {
+// 1. 修改用户信息 (含修改密码、部门、角色、状态)
+export async function PUT(
+    request: Request,
+    { params }: { params: { id: string } }
+) {
     try {
-        const id = (await context.params).id;
-        const { password, name, deptId, status, roleIds } = await request.json();
+        const id = params.id;
+        const { name, deptId, status, password, roleIds } = await request.json();
 
-        const dataToUpdate: any = {
+        // 构造基础数据
+        const data: any = {
             name,
             deptId: deptId || null,
-            status: status !== undefined ? Number(status) : undefined,
+            status: status !== undefined ? Number(status) : 1,
         };
 
-        if (password) {
-            dataToUpdate.password = await bcrypt.hash(password, 10);
+        // 如果传了密码，则进行哈希处理
+        if (password && password.trim() !== '') {
+            data.password = await bcrypt.hash(password, 10);
         }
 
-        // Role IDs handle if provided in the master update endpoint
-        if (roleIds !== undefined) {
-            dataToUpdate.userRoles = {
-                deleteMany: {}, // Clear old
-                create: roleIds.map((rId: string) => ({ role: { connect: { id: rId } } }))
-            };
-        }
+        // 使用事务执行更新及角色重新绑定
+        const updatedUser = await prisma.$transaction(async (tx) => {
+            // 1. 更新用户基本信息
+            const user = await tx.user.update({
+                where: { id },
+                data
+            });
 
-        const user = await prisma.user.update({
-            where: { id },
-            data: dataToUpdate
+            // 2. 如果传了角色列表，则全量替换
+            if (roleIds) {
+                // 先删除旧关联
+                await tx.userRole.deleteMany({
+                    where: { userId: id }
+                });
+                // 插入新关联
+                if (roleIds.length > 0) {
+                    await tx.userRole.createMany({
+                        data: roleIds.map((rId: string) => ({
+                            userId: id,
+                            roleId: rId
+                        }))
+                    });
+                }
+            }
+
+            return user;
         });
 
-        return NextResponse.json({ code: 200, data: { ...user, password: '' }, message: '更新成功' });
+        return NextResponse.json({ code: 200, data: { ...updatedUser, password: '' }, message: '修改成功' });
     } catch (error) {
         console.error('User Update Error:', error);
-        return NextResponse.json({ code: 500, message: '更新失败' }, { status: 500 });
+        return NextResponse.json({ code: 500, message: '修改失败' }, { status: 500 });
     }
 }
 
-export async function DELETE(request: Request, context: any) {
+// 2. 逻辑删除用户信息 (禁用状态)
+export async function DELETE(
+    request: Request,
+    { params }: { params: { id: string } }
+) {
     try {
-        const id = (await context.params).id;
-
-        // Optional Check: don't allow to delete user with specific admin roles, or self
-        // For simplicity, we just delete with cascade constraints handled by Prisma 
-        await prisma.user.delete({
-            where: { id }
+        const id = params.id;
+        
+        // 按照用户要求，执行“逻辑禁用”而不是物理删除
+        await prisma.user.update({
+            where: { id },
+            data: { status: 0 } // 0=停用
         });
 
-        return NextResponse.json({ code: 200, message: '删除成功' });
+        return NextResponse.json({ code: 200, message: '用户已成功禁用' });
     } catch (error) {
-        console.error('User Delete Error:', error);
-        return NextResponse.json({ code: 500, message: '删除失败' }, { status: 500 });
+        console.error('User Disable Error:', error);
+        return NextResponse.json({ code: 500, message: '禁用失败' }, { status: 500 });
     }
 }

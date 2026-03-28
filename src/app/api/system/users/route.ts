@@ -53,8 +53,8 @@ export async function POST(request: Request) {
     try {
         const { username, password, name, deptId, status, roleIds } = await request.json();
 
-        if (!username || !password || !name) {
-            return NextResponse.json({ code: 400, message: '核心字段不能为空' }, { status: 400 });
+        if (!username || !name) {
+            return NextResponse.json({ code: 400, message: '账号和姓名不能为空' }, { status: 400 });
         }
 
         // Check if user exists
@@ -66,7 +66,9 @@ export async function POST(request: Request) {
             return NextResponse.json({ code: 400, message: '账号已存在' }, { status: 400 });
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        // 密码下发逻辑：如果没有传，则随机生成一个 8 位临时密码
+        const rawPassword = password || Math.random().toString(36).slice(-8);
+        const hashedPassword = await bcrypt.hash(rawPassword, 10);
 
         const user = await prisma.user.create({
             data: {
@@ -82,9 +84,14 @@ export async function POST(request: Request) {
             }
         });
 
-        return NextResponse.json({ code: 200, data: { ...user, password: '' }, message: '建档成功' });
+        return NextResponse.json({ 
+            code: 200, 
+            data: { ...user, password: '', _tempPassword: password ? undefined : rawPassword }, 
+            message: '建档成功' 
+        });
     } catch (error) {
         console.error('User Create Error:', error);
         return NextResponse.json({ code: 500, message: '创建失败' }, { status: 500 });
     }
 }
+
